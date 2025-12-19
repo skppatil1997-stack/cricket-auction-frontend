@@ -39,22 +39,105 @@ function App() {
 
   // 🔐 If admin is logged in
   if (isAdmin) {
-    return (
-      <div style={{ padding: 40 }}>
-        <h1>Admin Dashboard 🏏</h1>
-        <p>You are logged in as Admin.</p>
+  const [player, setPlayer] = useState({
+    name: "",
+    runs: "",
+    wickets: "",
+    matches: "",
+    basePrice: ""
+  });
+  const [status, setStatus] = useState("");
 
-        <button
-          onClick={() => {
-            localStorage.removeItem("adminToken");
-            window.location.reload();
-          }}
-        >
-          Logout
-        </button>
-      </div>
-    );
-  }
+  const addPlayer = async () => {
+    const token = localStorage.getItem("adminToken");
+
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/admin/players`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token
+          },
+          body: JSON.stringify(player)
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setStatus(data.message || "Failed to add player");
+        return;
+      }
+
+      setStatus("Player added successfully ✅");
+      setPlayer({
+        name: "",
+        runs: "",
+        wickets: "",
+        matches: "",
+        basePrice: ""
+      });
+    } catch {
+      setStatus("Server error");
+    }
+  };
+
+  return (
+    <div style={{ padding: 40 }}>
+      <h1>Admin Dashboard 🏏</h1>
+
+      <h3>Add Player</h3>
+
+      <input
+        placeholder="Name"
+        value={player.name}
+        onChange={e => setPlayer({ ...player, name: e.target.value })}
+      /><br />
+
+      <input
+        placeholder="Runs"
+        value={player.runs}
+        onChange={e => setPlayer({ ...player, runs: e.target.value })}
+      /><br />
+
+      <input
+        placeholder="Wickets"
+        value={player.wickets}
+        onChange={e => setPlayer({ ...player, wickets: e.target.value })}
+      /><br />
+
+      <input
+        placeholder="Matches"
+        value={player.matches}
+        onChange={e => setPlayer({ ...player, matches: e.target.value })}
+      /><br />
+
+      <input
+        placeholder="Base Price"
+        value={player.basePrice}
+        onChange={e => setPlayer({ ...player, basePrice: e.target.value })}
+      /><br /><br />
+
+      <button onClick={addPlayer}>Add Player</button>
+
+      <p>{status}</p>
+
+      <hr />
+
+      <button
+        onClick={() => {
+          localStorage.removeItem("adminToken");
+          window.location.reload();
+        }}
+      >
+        Logout
+      </button>
+    </div>
+  );
+}
+
 
   // 🔑 Login screen
   return (
