@@ -1,0 +1,7 @@
+cd cricket-auction
+git init
+git add .
+git commit -m "Initial frontend"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/cricket-auction-frontend.git
+git push -u origin main
