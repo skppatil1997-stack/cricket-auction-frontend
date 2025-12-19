@@ -1,8 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (token) {
+      setIsAdmin(true);
+    }
+  }, []);
 
   const login = async () => {
     try {
@@ -23,12 +31,32 @@ function App() {
       }
 
       localStorage.setItem("adminToken", data.token);
-      setMessage("Admin login successful ✅");
-    } catch (err) {
+      setIsAdmin(true);
+    } catch {
       setMessage("Server error");
     }
   };
 
+  // 🔐 If admin is logged in
+  if (isAdmin) {
+    return (
+      <div style={{ padding: 40 }}>
+        <h1>Admin Dashboard 🏏</h1>
+        <p>You are logged in as Admin.</p>
+
+        <button
+          onClick={() => {
+            localStorage.removeItem("adminToken");
+            window.location.reload();
+          }}
+        >
+          Logout
+        </button>
+      </div>
+    );
+  }
+
+  // 🔑 Login screen
   return (
     <div style={{ padding: 40 }}>
       <h2>Admin Login</h2>
@@ -50,4 +78,3 @@ function App() {
 }
 
 export default App;
-
